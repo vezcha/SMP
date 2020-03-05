@@ -1,0 +1,24 @@
+{
+  "name": "smp",
+  "version": "1.0.0",
+  "description": "stock portfolio tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vezcha/SMP.git"
+  },
+  "keywords": [
+    "stock",
+    "market",
+    "portfolio"
+  ],
+  "author": "brandon shaver",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vezcha/SMP/issues"
+  },
+  "homepage": "https://github.com/vezcha/SMP#readme"
+}
