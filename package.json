@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/vezcha/SMP/issues"
   },
-  "homepage": "https://github.com/vezcha/SMP#readme"
+  "homepage": "https://github.com/vezcha/SMP#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.0"
+  }
 }
