@@ -92,13 +92,13 @@ test("calculate the stock data", () => {
     low: 0,
     currentValue: 0
   };
+  var totalValue = 0;
 
-  app.calcStockData(historical, output);
+  app.calcStockData(historical, output, totalValue);
 
   expect(output.high).toEqual(7.34);
   expect(output.low).toEqual(6.71);
   expect(output.currentValue).toEqual(33.7);
-  //   expect(app.totalValue).toEqual(33.7);
 });
 
 //test if app is able to format the data correctly
@@ -131,11 +131,11 @@ test("write data line to csv", () => {
     currentValue: '"$1,471.68"'
   };
 
-  app.setup(); //clear file
-  app.writeDataAsCSV(output);
-
-  const fileString = fs.readFileSync(app.outputFile, "utf8");
-  expect(fileString).toMatch('B,28,$52.56,$57.06,$51.83,"$1,471.68"');
+  return app.setup().then(() => {
+    app.writeDataAsCSV(output);
+    const fileString = fs.readFileSync(app.outputFile, "utf8");
+    expect(fileString).toMatch('B,28,$52.56,$57.06,$51.83,"$1,471.68"');
+  });
 });
 
 //test if app is able to write the final total to output file
