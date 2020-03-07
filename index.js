@@ -3,6 +3,18 @@ const fetch = require("node-fetch");
 
 const outputFile = "output.csv";
 
+module.exports = {
+  setup,
+  outputFile,
+  totalValue,
+  fetchRealTimePrice,
+  fetchHistoricalData,
+  calcStockData,
+  formatData,
+  writeDataAsCSV,
+  formatAndWriteTotal
+};
+
 // Kroger Co - KR Campbell Soup - CPB Tesla - TSLA
 const orders = [
   { stockSymbol: "KR", quantity: 1000, type: "buy", date: "2019-01-01" },
@@ -17,12 +29,17 @@ const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2
 });
 
-let totalValue = 0;
+var totalValue = 0;
 
-main();
+myApp(); //run myApp
+
+function myApp() {
+  main();
+}
 
 async function main() {
   await setup();
+  //iterate through each stock order
   for (let i = 0; i < orders.length; i++) {
     //create an output object
     let output = {
@@ -44,13 +61,15 @@ async function main() {
       orders[i].date
     );
 
-    formatAndWriteData(historical, output);
+    calcStockData(historical, output);
+    formatData(output);
+    writeDataAsCSV(output);
   }
-  formatAndWriteTotal();
+  formatAndWriteTotal(totalValue);
 }
 
 function setup() {
-  //clear output file asynchronously
+  //clear output file
   return new Promise(function(resolve, reject) {
     fs.writeFile(outputFile, "", function() {
       resolve();
@@ -84,11 +103,8 @@ function fetchHistoricalData(stock, date) {
     });
   }
 }
-//formatAndWriteTotal();
 
-//test and validate (jest)
-
-function formatAndWriteData(historical, output) {
+function calcStockData(historical, output) {
   //search through historical and find lowest low and highest high
   historical.forEach((day, index) => {
     if (index === 0) (output.high = day.high), (output.low = day.low);
@@ -101,13 +117,25 @@ function formatAndWriteData(historical, output) {
 
   //add to total value
   totalValue += output.currentValue;
+}
 
+function formatData(output) {
   //format currency values
   output.currentPrice = formatter.format(output.currentPrice);
   output.high = formatter.format(output.high);
   output.low = formatter.format(output.low);
   output.currentValue = formatter.format(output.currentValue);
 
+  //add csv delimiter if string contains a comma
+  if (output.currentPrice.indexOf(",") > 0)
+    output.currentPrice = '"' + output.currentPrice + '"';
+  if (output.high.indexOf(",") > 0) output.high = '"' + output.high + '"';
+  if (output.low.indexOf(",") > 0) output.low = '"' + output.low + '"';
+  if (output.currentValue.indexOf(",") > 0)
+    output.currentValue = '"' + output.currentValue + '"';
+}
+
+function writeDataAsCSV(output) {
   //write record to output.csv, assume utf-8 encoding
   const dataString =
     output.ticker +
@@ -123,14 +151,15 @@ function formatAndWriteData(historical, output) {
     output.currentValue;
 
   fs.appendFileSync(outputFile, dataString + "\n");
-  console.log("Wrote order " + dataString + " to " + outputFile);
 }
 
-function formatAndWriteTotal() {
+function formatAndWriteTotal(totalValue) {
   //format totalValue
   totalValue = formatter.format(totalValue);
 
+  //add csv delimiter if necessary
+  if (totalValue.indexOf(",") > 0) totalValue = '"' + totalValue + '"';
+
   //write totalValue record
   fs.appendFileSync(outputFile, ",,,,," + totalValue);
-  console.log("Wrote total value: " + totalValue + " to " + outputFile);
 }
